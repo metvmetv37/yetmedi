@@ -8,14 +8,22 @@ def get_stream_url(channel_id):
         else:
             url = f"https://www.youtube.com/channel/{channel_id}/live"
 
-        # Çerez dosyasını (cookies.txt) kullanarak bot korumasını aşıyoruz
-        result = subprocess.run(
-            ['yt-dlp', '-g', '-f', 'best[protocol^=m3u8]', '--cookies', 'cookies.txt', url],
-            capture_output=True, text=True, timeout=25
-        )
+        # Deno runtime'ı ve çerezleri ekliyoruz
+        cmd = [
+            'yt-dlp', 
+            '-g', 
+            '-f', 'best[protocol^=m3u8]', 
+            '--js-runtimes', 'deno', # JavaScript runtime eklendi
+            '--cookies', 'cookies.txt', 
+            url
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         
         if result.returncode != 0:
-            print(f"yt-dlp Hatası ({channel_id}): {result.stderr.strip()}")
+            # Hata mesajını daha kısa ve okunaklı yazdıralım
+            err_msg = result.stderr.strip().split('\n')[-1] 
+            print(f"BAŞARISIZ ({channel_id}): {err_msg}")
             return None
             
         return result.stdout.strip()
@@ -50,11 +58,11 @@ def main():
             m3u8_content += f'#EXTINF:-1 group-title="{group}",{name}\n{stream_url}\n'
             print(f"BAŞARILI: {name}")
         else:
-            print(f"BAŞARISIZ: {name}")
+            pass # Hata mesajı yukarıda yazdırıldı
 
     with open('youtube.m3u8', 'w', encoding='utf-8') as f:
         f.write(m3u8_content)
-    print("İşlem tamamlandı. youtube.m3u8 güncellendi.")
+    print("İşlem tamamlandı.")
 
 if __name__ == "__main__":
     main()

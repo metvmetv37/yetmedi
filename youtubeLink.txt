@@ -1,0 +1,11 @@
+NTV || @NTV || Haber
+TRT 1 || @TRT1 || Genel
+TV100 || @tv100 || Haber
+Halk TV || @HalkTV || Haber
+Sözcü TV || @SozcüTV || Haber
+TGRT Haber || @TGRTHaber || Haber
+A Haber || @ahaber || Haber
+Bloomberg HT || @BloombergHT || Ekonomi
+TRT Spor || @TRTSpor || Spor
+A Spor || @ASpor || Spor
+TRT Müzik || @TRTMuzik || Müzik

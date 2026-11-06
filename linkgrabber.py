@@ -8,20 +8,22 @@ def get_stream_url(channel_id):
         else:
             url = f"https://www.youtube.com/channel/{channel_id}/live"
 
-        # Deno runtime'ı ve çerezleri ekliyoruz
+        # Çerez dosyasının yolunu tam olarak belirtiyoruz
+        cookie_path = os.path.join(os.getcwd(), 'cookies.txt')
+        
         cmd = [
             'yt-dlp', 
             '-g', 
             '-f', 'best[protocol^=m3u8]', 
-            '--js-runtimes', 'deno', # JavaScript runtime eklendi
-            '--cookies', 'cookies.txt', 
+            '--cookies', cookie_path,
+            '--js-runtimes', 'deno',
             url
         ]
 
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         
         if result.returncode != 0:
-            # Hata mesajını daha kısa ve okunaklı yazdıralım
+            # Hata mesajını daha temiz göster
             err_msg = result.stderr.strip().split('\n')[-1] 
             print(f"BAŞARISIZ ({channel_id}): {err_msg}")
             return None
@@ -34,6 +36,11 @@ def get_stream_url(channel_id):
 def main():
     m3u8_content = "#EXTM3U\n"
     
+    # Çerez dosyası var mı kontrol et
+    if not os.path.exists('cookies.txt'):
+        print("HATA: cookies.txt bulunamadı! Lütfen çerez dosyasını yükleyin.")
+        return
+
     if not os.path.exists('youtubeLink.txt'):
         print("HATA: youtubeLink.txt bulunamadı!")
         return
@@ -57,8 +64,6 @@ def main():
         if stream_url:
             m3u8_content += f'#EXTINF:-1 group-title="{group}",{name}\n{stream_url}\n'
             print(f"BAŞARILI: {name}")
-        else:
-            pass # Hata mesajı yukarıda yazdırıldı
 
     with open('youtube.m3u8', 'w', encoding='utf-8') as f:
         f.write(m3u8_content)

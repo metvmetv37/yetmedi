@@ -1,0 +1,32 @@
+name: LinkGrabber
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Her 30 dakikada bir çalışır
+  workflow_dispatch:      # Manuel çalıştırma butonu
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install yt-dlp
+        run: |
+          pip install -U yt-dlp
+          
+      - name: Run LinkGrabber
+        run: python linkgrabber.py
+        
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add youtube.m3u8
+          git commit -m "Update m3u8 links" || exit 0
+          git push
